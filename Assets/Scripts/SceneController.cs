@@ -7,7 +7,6 @@ using GoogleARCore;
 public class SceneController : MonoBehaviour
 {
     public Camera firstPersonCamera;
-    public AvatarController avatarController;
     public AnchorManager anchorManager;
     
     private GameObject m_AvatarInstance;
@@ -41,6 +40,15 @@ public class SceneController : MonoBehaviour
             //ARCore is tracking, dont allow sleeping
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
         }
+        
+        if(anchorManager.CheckIfAnchorIsHit(firstPersonCamera))
+        {
+            Debug.Log("Ray hit something!");
+        }
+        else
+        {
+            anchorManager.spawnAnchor();
+        } 
     }
 
     /*
@@ -58,29 +66,6 @@ public class SceneController : MonoBehaviour
         }
     }
 
-    /*void ProcessTouches()
-    {
-        
-        Touch touch;
-        //check if the user touched the screen
-        if(Input.touchCount < 1 || (touch = Input.GetTouch(0)).phase != TouchPhase.Began)
-        {
-            return;
-        }
-
-        TrackableHit hit;
-        TrackableHitFlags raycastFilter = TrackableHitFlags.PlaneWithinBounds | TrackableHitFlags.PlaneWithinPolygon;
-
-        if (Frame.Raycast(touch.position.x, touch.position.y, raycastFilter, out hit))
-        {
-            
-            m_AvatarInstance = Instantiate(avatar, hit.Pose.position, hit.Pose.rotation);
-            
-            var anchor = Session.CreateAnchor(hit.Pose);
-
-            m_AvatarInstance.transform.parent = anchor.transform;
-        } 
-    }*/
 
     public void ClearArCoreSession()
     {
