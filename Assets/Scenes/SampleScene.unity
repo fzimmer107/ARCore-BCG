@@ -1153,9 +1153,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   firstPersonCamera: {fileID: 1545066508}
-  firstButton: {fileID: 552772274}
-  secondButton: {fileID: 1945439942}
-  destroyButton: {fileID: 1353133961}
+  firstButton: {fileID: 139900037}
+  secondButton: {fileID: 1141408954}
+  destroyButton: {fileID: 1999064206}
   avatarModels:
   - {fileID: 8077216876591573161, guid: d54c8cc75865bb54e9286d3bf65b679b, type: 3}
   - {fileID: 1190091649889860, guid: 242a320930b81430ba610f94f9b760c8, type: 3}
