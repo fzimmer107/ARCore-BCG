@@ -6,10 +6,9 @@ using GoogleARCore;
 
 public class SceneController : MonoBehaviour
 {
-    public Camera firstPersonCamera;
+    
     public AnchorManager anchorManager;
     
-    private GameObject m_AvatarInstance;
     private List<DetectedPlane> m_AllDetectedPlanes = new List<DetectedPlane>();
     
     // Start is called before the first frame update
@@ -41,14 +40,7 @@ public class SceneController : MonoBehaviour
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
         }
         
-        if(anchorManager.CheckIfAnchorIsHit(firstPersonCamera))
-        {
-            Debug.Log("Ray hit something!");
-        }
-        else
-        {
-            anchorManager.spawnAnchor();
-        } 
+  
     }
 
     /*

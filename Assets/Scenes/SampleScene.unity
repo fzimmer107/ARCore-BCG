@@ -221,7 +221,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ab4dd3f45b992f4bb25faa6225cfdd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  firstPersonCamera: {fileID: 1545066508}
   anchorManager: {fileID: 879041025}
 --- !u!4 &364834918
 Transform:
@@ -613,6 +612,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d02c000d7513a9144946e33f84c30c70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  firstPersonCamera: {fileID: 1545066508}
   firstButton: {fileID: 552772274}
   secondButton: {fileID: 1945439942}
   destroyButton: {fileID: 1353133961}
