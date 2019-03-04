@@ -1,22 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 using GoogleARCore;
-using TMPro;
-using Anchor = GoogleARCore.Anchor;
-using Debug = UnityEngine.Debug;
-using Trackable = GoogleARCore.Trackable;
+
 
 public class SceneController : MonoBehaviour
 {
-    public Camera firstPersonCamera;
-    public GameObject avatar;
-
-
-    private GameObject m_AvatarInstance;
+    
+    public AnchorManager anchorManager;
+    
     private List<DetectedPlane> m_AllDetectedPlanes = new List<DetectedPlane>();
-
     
     // Start is called before the first frame update
     void Start()
@@ -46,9 +39,8 @@ public class SceneController : MonoBehaviour
             //ARCore is tracking, dont allow sleeping
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
         }
-
         
-        ProcessTouches(); 
+  
     }
 
     /*
@@ -66,28 +58,6 @@ public class SceneController : MonoBehaviour
         }
     }
 
-    void ProcessTouches()
-    {
-        Touch touch;
-        //check if the user touched the screen
-        if(Input.touchCount < 1 || (touch = Input.GetTouch(0)).phase != TouchPhase.Began)
-        {
-            return;
-        }
-
-        TrackableHit hit;
-        TrackableHitFlags raycastFilter = TrackableHitFlags.PlaneWithinBounds | TrackableHitFlags.PlaneWithinPolygon;
-
-        if (Frame.Raycast(touch.position.x, touch.position.y, raycastFilter, out hit))
-        {
-            
-            m_AvatarInstance = Instantiate(avatar, hit.Pose.position, hit.Pose.rotation);
-            
-            var anchor = Session.CreateAnchor(hit.Pose);
-
-            m_AvatarInstance.transform.parent = anchor.transform;
-        }
-    }
 
     public void ClearArCoreSession()
     {
