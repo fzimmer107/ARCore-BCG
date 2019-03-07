@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using GoogleARCore;
 using GoogleARCoreInternal;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class AnchorManager : MonoBehaviour
@@ -20,7 +21,7 @@ public class AnchorManager : MonoBehaviour
 
     
     public Camera firstPersonCamera;
-    public Button firstButton, secondButton, destroyButton;
+    public Button firstButton, secondButton;
     public GameObject[] avatarModels;
 
  
@@ -30,14 +31,14 @@ public class AnchorManager : MonoBehaviour
     {
         firstButton.onClick.AddListener(delegate { ChangeAvatar(m_SelectedAnchorAvatar,1);});
         secondButton.onClick.AddListener(delegate { ChangeAvatar(m_SelectedAnchorAvatar,2); });
-        destroyButton.onClick.AddListener(delegate {ChangeAvatar(m_SelectedAnchorAvatar);});
+       
     }
 
     // Update is called once per frame
     void Update()
     {
         if (Input.touchCount > 0)
-        {
+        {            
             m_AcumTime += Input.GetTouch(0).deltaTime;
             
             if (m_AcumTime >= m_HoldTime && m_IsHold == false)
@@ -49,6 +50,13 @@ public class AnchorManager : MonoBehaviour
 
             if (Input.GetTouch(0).phase == TouchPhase.Ended)
             {
+                if(EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId)
+                    || EventSystem.current.currentSelectedGameObject != null)
+                {
+                    Debug.Log(EventSystem.current.currentSelectedGameObject);
+                    return;
+                }
+                
                 if (m_AnchorMoveMode)
                 {
                     TrackableHit trackableHit;
@@ -107,38 +115,7 @@ public class AnchorManager : MonoBehaviour
             }
         }      
     }
-
-
-    public void ProcessTouches(Camera camera)
-    {
-        Touch touch;
-        //check if the user touched the screen
-        if (Input.touchCount < 1 || (touch = Input.GetTouch(0)).phase != TouchPhase.Began)
-        {
-            return;
-        } 
-             
-        if (m_AnchorMoveMode)
-        {
-            //cast ray and set anchor to position
-        }
-        RaycastHit hit;
-        if (CheckIfAnchorIsHit(camera,touch, out hit))
-        {
-            
-                Debug.Log("ray hit something");
-                m_SelectedAnchorAvatar = hit.transform.parent.GetComponent<AnchorAvatar>();
-                m_ActiveAnchor = hit.transform.parent.GetComponent<Anchor>();
-                     
-        }
-        else
-        {
-            SpawnAnchor(touch);
-        }
-        
-       
-    }
-    
+     
     public void SpawnAnchor(Touch touch)
     {
     /*    Touch touch;
