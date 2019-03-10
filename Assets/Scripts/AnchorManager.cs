@@ -18,7 +18,7 @@ public class AnchorManager : MonoBehaviour
     private float m_AcumTime; //default zero
     private bool m_AnchorMoveMode; //default false
     private bool m_IsHold; //default false
-
+    
     
     public Camera firstPersonCamera;
     public Button firstButton, secondButton;
@@ -37,7 +37,34 @@ public class AnchorManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.touchCount > 0)
+
+        if (Input.touchCount == 2)
+        {
+            
+            //store the touches
+            Touch touchZero = Input.GetTouch(0);
+            Touch touchOne = Input.GetTouch(1);
+            
+            Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
+            Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
+            
+            float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
+            float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
+            
+            float deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
+            
+            float v = m_SelectedAnchorAvatar.MScaleFactor * 100f;
+
+            // negative delta is stretching, positive is pinching
+            v -= deltaMagnitudeDiff * 1f;
+
+            m_SelectedAnchorAvatar.MScaleFactor = Mathf.Clamp(v, 1f, 1000f) / 100f;
+            
+            m_SelectedAnchorAvatar.transform.localScale = m_SelectedAnchorAvatar.MOriginalScale *  m_SelectedAnchorAvatar.MScaleFactor;
+        }
+        
+        
+        if (Input.touchCount == 1)
         {            
             m_AcumTime += Input.GetTouch(0).deltaTime;
             
