@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
+using UnityEditor;
 using UnityEngine;
 
 public class AnchorAvatar : MonoBehaviour
@@ -9,7 +11,29 @@ public class AnchorAvatar : MonoBehaviour
     private float m_ModelRotation = 180.0f;
     private Vector3 m_OriginalScale;
     private float m_ScaleFactor = 1.0f;
+    
+    private bool m_IsSelected;
+    private bool m_IsSpeaking;
+    private bool m_WaitingForInput;
+    
+    public bool MIsSelected
+    {
+        get { return m_IsSelected; }
+        set { m_IsSelected = value; }
+    }
 
+    public bool MIsSpeaking
+    {
+        get { return m_IsSpeaking; }
+        set { m_IsSpeaking = value; }
+    }
+
+    public bool MWaitingForInput
+    {
+        get { return m_WaitingForInput; }
+        set { m_WaitingForInput = value; }
+    }
+    
     public int MAnchorAvatarIndex
     {
         get { return m_AnchorAvatarIndex; }
@@ -34,7 +58,7 @@ public class AnchorAvatar : MonoBehaviour
         set { m_ScaleFactor = value; }
     }
 
-    public void SpawnAvatar(GameObject avatar, Transform parentTransform, int avatarIndex = 0)
+    public void SpawnAvatar(GameObject avatar, Transform parentTransform, int avatarIndex)
     {
         Debug.Log("Creating new Avatar Object");
         Debug.Log("position: " + parentTransform.position);
@@ -43,6 +67,10 @@ public class AnchorAvatar : MonoBehaviour
         m_AnchorAvatarInstance.transform.Rotate(0, m_ModelRotation, 0, Space.Self);
         m_AnchorAvatarIndex = avatarIndex;
         m_OriginalScale = avatar.transform.localScale;
+        m_IsSelected = true;
     }
-
+    
+    
+    
+    
 }

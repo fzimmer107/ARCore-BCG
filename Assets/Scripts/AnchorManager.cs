@@ -21,7 +21,8 @@ public class AnchorManager : MonoBehaviour
     
     
     public Camera firstPersonCamera;
-    public Button firstButton, secondButton;
+    public Button firstButton, secondButton, speakButton;
+    
     public GameObject[] avatarModels;
 
  
@@ -29,18 +30,19 @@ public class AnchorManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        
         firstButton.onClick.AddListener(delegate { ChangeAvatar(m_SelectedAnchorAvatar,1);});
         secondButton.onClick.AddListener(delegate { ChangeAvatar(m_SelectedAnchorAvatar,2); });
+        speakButton.onClick.AddListener(delegate { ToggleSpeaking(m_SelectedAnchorAvatar);});
+        
        
     }
 
     // Update is called once per frame
     void Update()
     {
-
         if (Input.touchCount == 2)
-        {
-            
+        {       
             //store the touches
             Touch touchZero = Input.GetTouch(0);
             Touch touchOne = Input.GetTouch(1);
@@ -90,19 +92,13 @@ public class AnchorManager : MonoBehaviour
                     TrackableHitFlags raycastFilter =
                         TrackableHitFlags.PlaneWithinBounds | TrackableHitFlags.PlaneWithinPolygon;
                     
-                    Debug.Log("Anchor position before Change: x: "+ m_ActiveAnchor.transform.position.x + 
-                              " y: " + m_ActiveAnchor.gameObject.transform.position.y + "z: " + m_ActiveAnchor.gameObject.transform.position.z);
                     
                     if (Frame.Raycast(Input.GetTouch(0).position.x, Input.GetTouch(0).position.y, raycastFilter,
                         out trackableHit))
                     {
-                        m_ActiveAnchor.transform.position = trackableHit.Pose.position;
-                        //m_SelectedAnchorAvatar.MAnchorAvatarInstance.transform.position = trackableHit.Pose.position;
-                        m_SelectedAnchorAvatar.MAnchorAvatarInstance.SetActive(true);
-                        
-                        Debug.Log("Anchor position after Change: x: "+ m_ActiveAnchor.gameObject.transform.position.x + 
-                                  " y: " + m_ActiveAnchor.gameObject.transform.position.y + "z: " + m_ActiveAnchor.gameObject.transform.position.z);
-                        
+                        int oldAvatarIndex = m_SelectedAnchorAvatar.MAnchorAvatarIndex;
+                        DestroyAnchor();
+                        SpawnAnchor(Input.GetTouch(0),oldAvatarIndex); 
                         m_AnchorMoveMode = false;
                     }
                 }
@@ -113,11 +109,14 @@ public class AnchorManager : MonoBehaviour
                     {
                         if (CheckIfAnchorIsHit(firstPersonCamera, Input.GetTouch(0), out hit))
                         {
+                            
                             Debug.Log("long tap hit something!");
                             m_SelectedAnchorAvatar = hit.transform.parent.GetComponent<AnchorAvatar>();
+                            
                             m_ActiveAnchor = hit.transform.parent.GetComponent<Anchor>();
                             m_SelectedAnchorAvatar.MAnchorAvatarInstance.SetActive(false);
                             m_AnchorMoveMode = true;
+
                         }
 
                         m_IsHold = false;
@@ -126,14 +125,27 @@ public class AnchorManager : MonoBehaviour
                     {
                         if (CheckIfAnchorIsHit(firstPersonCamera, Input.GetTouch(0), out hit))
                         {
+                            m_SelectedAnchorAvatar.MIsSelected = false;
                             Debug.Log("tap hit something!");
                             m_SelectedAnchorAvatar = hit.transform.parent.GetComponent<AnchorAvatar>();
+                            m_SelectedAnchorAvatar.MIsSelected = true;
                             m_ActiveAnchor = hit.transform.parent.GetComponent<Anchor>();
                         }
 
                         else
                         {
-                            SpawnAnchor(Input.GetTouch(0));
+                            if (m_SelectedAnchorAvatar != null)
+                            {
+                                Debug.Log("ich bin hier im != null segment");
+                                m_SelectedAnchorAvatar.MIsSelected = false;
+                                SpawnAnchor(Input.GetTouch(0));
+                            }
+                            if(m_SelectedAnchorAvatar == null)
+                            {
+                                Debug.Log("ich bin um == null segment");
+                                SpawnAnchor(Input.GetTouch(0));    
+                            }
+                            
                         }
 
                     }
@@ -143,7 +155,8 @@ public class AnchorManager : MonoBehaviour
         }      
     }
      
-    public void SpawnAnchor(Touch touch)
+    
+    public void SpawnAnchor(Touch touch, int index = 0)
     {
     /*    Touch touch;
         //check if the user touched the screen
@@ -160,31 +173,10 @@ public class AnchorManager : MonoBehaviour
             m_SelectedPlane = hit.Trackable as DetectedPlane;
             m_ActiveAnchor  = m_SelectedPlane.CreateAnchor(hit.Pose);
             m_SelectedAnchorAvatar = m_ActiveAnchor.gameObject.AddComponent<AnchorAvatar>();
-            m_SelectedAnchorAvatar.SpawnAvatar(avatarModels[0], m_ActiveAnchor.transform);
-            
+            m_SelectedAnchorAvatar.SpawnAvatar(avatarModels[index], m_ActiveAnchor.transform, index);  
         }
     }
 
-  /*  public bool CheckIfAnchorIsHit(Camera camera)
-    {
-        Touch touch;
-        if (Input.touchCount < 1 || (touch = Input.GetTouch(0)).phase != TouchPhase.Began)
-        {
-            return false;
-        }
-        //construct ray
-        RaycastHit hit;
-        Ray ray = camera.ScreenPointToRay(new Vector3(touch.position.x, touch.position.y));
-
-        if (Physics.Raycast(ray, out hit))
-        {        
-            m_SelectedAnchorAvatar = hit.transform.parent.GetComponent<AnchorAvatar>();
-            m_ActiveAnchor = hit.transform.parent.GetComponent<Anchor>();
-            return true;       
-        }
-
-        return false;
-    }*/
 
     public bool CheckIfAnchorIsHit(Camera camera, Touch touch, out RaycastHit raycastHit)
     {
@@ -237,7 +229,27 @@ public class AnchorManager : MonoBehaviour
         
         Debug.Log("nach dem detach ist count = " + afterDetach.Count); */
     }
+
+    public void ToggleSpeaking(AnchorAvatar selectedAnchorAvatar)
+    {
+        Debug.Log("vor dem Touch war isSpeaking:" + selectedAnchorAvatar.MIsSpeaking );
+        
+        if (selectedAnchorAvatar.MIsSpeaking == false)
+        {
+            selectedAnchorAvatar.MIsSpeaking = !selectedAnchorAvatar.MIsSpeaking;
+            selectedAnchorAvatar.MAnchorAvatarInstance.GetComponent<AudioSource>().Play();
+        }
+        else
+        {
+            selectedAnchorAvatar.MIsSpeaking = !selectedAnchorAvatar.MIsSpeaking;
+            selectedAnchorAvatar.MAnchorAvatarInstance.GetComponent<AudioSource>().Stop();
+        }
+                
+        Debug.Log("nach dem Touch ist isSpeaking:" + selectedAnchorAvatar.MIsSpeaking );
+    }
+    
     
 }
+   
     
 

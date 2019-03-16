@@ -20,20 +20,25 @@ public class avatarAuwaehlen : MonoBehaviour
         getBtn = GameObject.Find("btnAvatarAuswahlen").GetComponent<Button>();
         
         Debug.Log("button aktiv?"+getBtn.IsActive());
-                
-        if (panel!= null && getBtn.IsActive())
+
+        if (panel != null)
         {
-            bool isActiv = panel.activeSelf;
-            panel.SetActive(!isActiv);
+            panel.SetActive(!panel.activeSelf);
+            
+
+        /*
+        if (panel != null && getBtn.IsActive())
+        {
+            //bool isActiv = panel.activeSelf;
+            panel.SetActive(!panel.activeSelf);
             //ChangeSelectionColor();
-            //Update();
             
             Debug.Log("panel aktiv? "+ panel.activeSelf);
             if (panel.activeSelf)
             {
                 
                
-            }
+            } */
 
             Debug.Log(" isInteractable? "+getBtn.IsInteractable());
             
