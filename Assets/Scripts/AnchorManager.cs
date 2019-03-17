@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using GoogleARCore;
 using GoogleARCoreInternal;
@@ -29,13 +30,10 @@ public class AnchorManager : MonoBehaviour
 
     // Start is called before the first frame update
     void Start()
-    {
-        
+    {    
         firstButton.onClick.AddListener(delegate { ChangeAvatar(m_SelectedAnchorAvatar,1);});
         secondButton.onClick.AddListener(delegate { ChangeAvatar(m_SelectedAnchorAvatar,2); });
-        speakButton.onClick.AddListener(delegate { ToggleSpeaking(m_SelectedAnchorAvatar);});
-        
-       
+        speakButton.onClick.AddListener(delegate { ToggleSpeaking(m_SelectedAnchorAvatar);});      
     }
 
     // Update is called once per frame
@@ -124,12 +122,12 @@ public class AnchorManager : MonoBehaviour
                     else
                     {
                         if (CheckIfAnchorIsHit(firstPersonCamera, Input.GetTouch(0), out hit))
-                        {
-                            m_SelectedAnchorAvatar.MIsSelected = false;
-                            Debug.Log("tap hit something!");
-                            m_SelectedAnchorAvatar = hit.transform.parent.GetComponent<AnchorAvatar>();
-                            m_SelectedAnchorAvatar.MIsSelected = true;
-                            m_ActiveAnchor = hit.transform.parent.GetComponent<Anchor>();
+                        {  
+                                m_SelectedAnchorAvatar.MIsSelected = false;
+                                Debug.Log("tap hit something!");
+                                m_SelectedAnchorAvatar = hit.transform.parent.GetComponent<AnchorAvatar>();
+                                m_SelectedAnchorAvatar.MIsSelected = true;
+                                m_ActiveAnchor = hit.transform.parent.GetComponent<Anchor>();
                         }
 
                         else
@@ -208,9 +206,29 @@ public class AnchorManager : MonoBehaviour
     }
     
     public void DestroyAnchor()
-    {        
-        DestroyImmediate(m_ActiveAnchor.gameObject);
-        m_SelectedAnchorAvatar = null;
+    {       
+        List<Anchor> allAnchors= new List<Anchor>();
+        Debug.Log(m_SelectedPlane);
+        m_SelectedPlane.GetAllAnchors(allAnchors);
+
+        if (allAnchors.Count > 1)
+        {
+            Debug.Log(allAnchors[0]);
+
+            int anchorIndex = allAnchors.FindIndex(anchor => anchor.GetComponentInChildren<AnchorAvatar>().MIsSelected);
+            Debug.Log("AnchorIndex is: " + anchorIndex);
+            
+            DestroyImmediate(m_ActiveAnchor.gameObject);
+            m_ActiveAnchor = allAnchors[anchorIndex - 1];
+            m_SelectedAnchorAvatar = m_ActiveAnchor.GetComponent<AnchorAvatar>();
+            m_SelectedAnchorAvatar.MIsSelected = true; 
+        }
+        else
+        {                 
+            DestroyImmediate(m_ActiveAnchor.gameObject);   
+            m_SelectedAnchorAvatar = null;
+        }
+        
             
        /* 
         List<Anchor> beforeDetach = new List<Anchor>();
